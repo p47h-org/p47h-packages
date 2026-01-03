@@ -1,0 +1,4 @@
+!*.wasm
+!*.js
+!*.d.ts
+!package.json

@@ -1,0 +1,101 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+
+jobs:
+  quality:
+    name: Audit & Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Fail fast if there are syntax or style errors
+      - name: Type check (TypeScript)
+        run: npm run typecheck
+
+      - name: Linter
+        run: npm run lint --workspaces --if-present
+
+  test:
+    name: Tests & Coverage
+    needs: quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm run test --workspaces --if-present
+
+      # Upload coverage from vault-js
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./packages/vault-js/coverage/lcov.info,./packages/vault-react/coverage/lcov.info
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+  build:
+    name: Build Verification
+    needs: quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build all packages
+        run: npm run build
+
+      # Check bundle sizes for both packages
+      - name: Check bundle sizes
+        run: |
+          echo "=== vault-js bundle ==="
+          if [ -f packages/vault-js/dist/index.js ]; then
+            SIZE=$(stat -c%s packages/vault-js/dist/index.js)
+            echo "vault-js bundle size: $SIZE bytes"
+            if [ $SIZE -gt 102400 ]; then
+              echo "::warning::vault-js bundle exceeds 100KB ($SIZE bytes)"
+            fi
+          else
+            echo "::warning::packages/vault-js/dist/index.js not found"
+          fi
+          
+          echo "=== vault-react bundle ==="
+          if [ -f packages/vault-react/dist/index.js ]; then
+            SIZE=$(stat -c%s packages/vault-react/dist/index.js)
+            echo "vault-react bundle size: $SIZE bytes"
+            if [ $SIZE -gt 102400 ]; then
+              echo "::warning::vault-react bundle exceeds 100KB ($SIZE bytes)"
+            fi
+          else
+            echo "::warning::packages/vault-react/dist/index.js not found"
+          fi

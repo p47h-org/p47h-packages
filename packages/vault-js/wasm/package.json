@@ -1,0 +1,24 @@
+{
+  "name": "p47h-wasm-oss",
+  "type": "module",
+  "collaborators": [
+    "p47h Team"
+  ],
+  "description": "Open Source WASM bindings for p47h governance engine (Apache-2.0)",
+  "version": "0.10.0",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/p47h-org/p47h-open-core"
+  },
+  "files": [
+    "p47h_wasm_core_bg.wasm",
+    "p47h_wasm_core.js",
+    "p47h_wasm_core.d.ts"
+  ],
+  "main": "p47h_wasm_core.js",
+  "types": "p47h_wasm_core.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}

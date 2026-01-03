@@ -1,0 +1,30 @@
+# P47H Packages Monorepo - Code Owners
+# =====================================
+# These owners will be requested for review when someone opens a PR
+# that modifies matching paths.
+
+# Default owners for everything
+* @p47h/p47h-team
+
+# ===== vault-js package =====
+# Core vault logic - requires security review
+/packages/vault-js/src/logic/ @p47h/p47h-team
+/packages/vault-js/src/adapters/ @p47h/p47h-team
+
+# Domain interfaces
+/packages/vault-js/src/domain/ @p47h/p47h-team
+
+# WASM binaries - must be from verified builds
+/packages/vault-js/wasm/ @p47h/p47h-team
+
+# ===== vault-react package =====
+/packages/vault-react/src/ @p47h/p47h-team
+
+# ===== Root configuration =====
+# CI/CD and security configuration
+/.github/ @p47h/p47h-team
+/package.json @p47h/p47h-team
+/packages/*/package.json @p47h/p47h-team
+
+# Documentation
+*.md @p47h/p47h-team

@@ -1,0 +1,177 @@
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  margin: 0;
+  background: #1a1a2e;
+  color: #eee;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+h1 { 
+  color: #00d4ff; 
+  margin-bottom: 8px; 
+  font-size: 28px;
+}
+
+h2 { 
+  color: #888; 
+  font-size: 14px; 
+  margin-top: 0; 
+  font-weight: normal; 
+}
+
+.card {
+  background: #16213e;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+  border: 1px solid #0f3460;
+}
+
+.card h3 {
+  margin-top: 0;
+  color: #00d4ff;
+  font-size: 16px;
+}
+
+.success { color: #00ff88; }
+.error { color: #ff4757; }
+.warning { color: #ffa502; }
+.pending { color: #ffa502; }
+.info { color: #00d4ff; }
+
+pre {
+  background: #0f0f23;
+  padding: 12px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 10px 0;
+}
+
+code { font-family: 'Fira Code', 'Consolas', monospace; }
+
+button {
+  background: #00d4ff;
+  color: #1a1a2e;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+button:hover { background: #00a8cc; }
+button:disabled { 
+  background: #444; 
+  cursor: not-allowed;
+  color: #888;
+}
+
+button.danger {
+  background: #ff4757;
+  color: white;
+}
+button.danger:hover { background: #ff3344; }
+
+input {
+  background: #0f0f23;
+  border: 1px solid #0f3460;
+  padding: 12px;
+  border-radius: 8px;
+  color: #eee;
+  width: 100%;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+input:focus {
+  outline: none;
+  border-color: #00d4ff;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-badge.init { background: #ffa502; color: #1a1a2e; }
+.status-badge.locked { background: #ff4757; color: white; }
+.status-badge.unlocked { background: #00ff88; color: #1a1a2e; }
+.status-badge.error { background: #ff4757; color: white; }
+
+.secret-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.secret-item {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  background: #0f0f23;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.secret-item .key {
+  flex: 1;
+  font-family: monospace;
+  color: #00d4ff;
+}
+
+.secret-item .value {
+  flex: 2;
+  font-family: monospace;
+  color: #00ff88;
+  word-break: break-all;
+}
+
+.secret-item .actions {
+  margin-left: 12px;
+}
+
+.secret-item button {
+  padding: 6px 12px;
+  font-size: 12px;
+  margin: 0;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #0f3460;
+  border-top-color: #00d4ff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.flex-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.mt-2 { margin-top: 20px; }
+.mb-2 { margin-bottom: 20px; }
