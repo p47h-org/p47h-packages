@@ -35,6 +35,9 @@ coverage/
 # WASM build artifacts (keep source .wasm files)
 target/
 
+# Local scripts
+scripts/
+
 # Lock files in subpackages (use root only)
 packages/*/package-lock.json
 packages/*/yarn.lock
