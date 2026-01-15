@@ -65,11 +65,15 @@ export interface P47hClientInstance {
 // ============================================================================
 
 /**
- * Constructs versioned WASM path.
- * Version is embedded in filename to bust browser cache.
+ * Constructs the default WASM path.
+ * Uses the standard wasm-bindgen output naming convention.
+ * 
+ * File structure in /wasm/:
+ *   - p47h_wasm_core.js       (JavaScript glue)
+ *   - p47h_wasm_core_bg.wasm  (WASM binary)
  */
 function getDefaultWasmPath(): string {
-  return `/wasm/p47h_vault_v${REQUIRED_CORE_VERSION}.wasm`;
+  return `/wasm/p47h_wasm_core_bg.wasm`;
 }
 
 // ============================================================================
@@ -152,16 +156,24 @@ export class WasmCryptoAdapter {
   /**
    * Loads the WASM JavaScript glue module.
    * Uses fetch to load from public path - does not use static imports.
+   * 
+   * wasm-bindgen output naming:
+   *   - p47h_wasm_core.js       (glue code)
+   *   - p47h_wasm_core_bg.wasm  (binary)
+   * 
+   * Given wasmPath like '/wasm/p47h_wasm_core_bg.wasm',
+   * we derive glueUrl as '/wasm/p47h_wasm_core.js'
    */
   private async loadWasmModule(): Promise<P47hWasmModule> {
-    // Construct versioned glue.js path matching the WASM binary
-    const glueUrl = this._wasmPath.replace('.wasm', '.js');
+    // Derive glue.js path from WASM binary path
+    // Remove '_bg.wasm' suffix and add '.js'
+    const glueUrl = this._wasmPath.replace(/_bg\.wasm$/, '.js');
 
     const response = await fetch(glueUrl);
     if (!response.ok) {
       throw new Error(
-        `Failed to load WASM module: HTTP ${response.status}. ` +
-          `Ensure ${glueUrl} is available.`
+        `Failed to load WASM glue module: HTTP ${response.status}. ` +
+          `Expected ${glueUrl} to be available.`
       );
     }
 

@@ -139,4 +139,49 @@ vault.lock(): void;
 
 ---
 
+## Security
+
+### Content Security Policy (CSP)
+
+When deploying P47H Vault, configure your CSP headers to restrict WASM loading:
+
+```http
+Content-Security-Policy: 
+  default-src 'self';
+  script-src 'self' 'wasm-unsafe-eval';
+  connect-src 'self';
+```
+
+**Key directives:**
+
+| Directive    | Value                | Purpose                                   |
+| ------------ | -------------------- | ----------------------------------------- |
+| `script-src` | `'wasm-unsafe-eval'` | Required for WASM instantiation           |
+| `script-src` | `'self'`             | Only load WASM from your origin           |
+| `connect-src`| `'self'`             | Prevent exfiltration to external servers  |
+
+### Subresource Integrity (SRI)
+
+For CDN deployments, verify WASM integrity before loading:
+
+```typescript
+import { P47hVault } from '@p47h/vault-js';
+
+const vault = new P47hVault();
+await vault.init({
+  wasmPath: 'https://cdn.example.com/wasm/p47h_vault.wasm',
+  // Optional: verify hash before instantiation
+  expectedHash: 'sha384-OLBgp1GsljhM2TJ+sbHjaiH9txEUvgdDTAzHvSG...'
+});
+```
+
+### Best Practices
+
+1. **Never log secrets** — Wrap errors in `VaultError` that sanitizes sensitive data
+2. **Clear buffers** — Call `vault.lock()` when user navigates away
+3. **Use HTTPS** — Required for SubtleCrypto and secure WASM loading
+4. **Pin dependencies** — Use `npm ci` in CI/CD to respect lockfile
+
+---
+
 Copyright © 2025 P47H. Licensed under Apache 2.0.

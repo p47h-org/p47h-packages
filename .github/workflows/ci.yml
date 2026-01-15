@@ -22,6 +22,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Security audit - fail on high severity
+      - name: Security Audit
+        run: npm audit --audit-level=high
+
       # Fail fast if there are syntax or style errors
       - name: Type check (TypeScript)
         run: npm run typecheck
@@ -92,7 +96,7 @@ jobs:
           else
             echo "::warning::packages/vault-js/dist/index.js not found"
           fi
-          
+
           echo "=== vault-react bundle ==="
           if [ -f packages/vault-react/dist/index.js ]; then
             SIZE=$(stat -c%s packages/vault-react/dist/index.js)
