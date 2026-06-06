@@ -1,0 +1,17 @@
+{
+  "name": "vault-js-vanilla-example",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@p47h/vault-js": "^0.10.2"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>P47H Vault — vanilla JS example</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        margin: 0;
+        background: #1a1a2e;
+        color: #eee;
+        padding: 2rem;
+      }
+      h1 { font-size: 1.25rem; }
+      #log {
+        background: #11111b;
+        border: 1px solid #313244;
+        border-radius: 8px;
+        padding: 1rem;
+        white-space: pre-wrap;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.85rem;
+        min-height: 12rem;
+        max-height: 60vh;
+        overflow: auto;
+      }
+      p { color: #a6adc8; font-size: 0.85rem; }
+    </style>
+  </head>
+  <body>
+    <h1>🔐 P47H Vault — vanilla JS</h1>
+    <p>Local-first: identity, encrypted secrets, and signing. All in-browser. Open the page; the flow runs once.</p>
+    <pre id="log"></pre>
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>

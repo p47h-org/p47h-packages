@@ -8,9 +8,10 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      // Link to local built packages (relative paths from project root)
+      // Link to local built packages (relative paths from the example dir).
+      // Both live under packages/: vault-react is ../dist, vault-js is ../../vault-js/dist.
       '@p47h/vault-react': new URL('../dist/index.mjs', import.meta.url).pathname.replace(/^\/([A-Z]:)/, '$1'),
-      '@p47h/vault-js': new URL('../../../p47h-vault-js/dist/index.js', import.meta.url).pathname.replace(/^\/([A-Z]:)/, '$1'),
+      '@p47h/vault-js': new URL('../../vault-js/dist/index.js', import.meta.url).pathname.replace(/^\/([A-Z]:)/, '$1'),
     },
   },
   assetsInclude: ['**/*.wasm'],

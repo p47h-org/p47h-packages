@@ -41,13 +41,8 @@ import type { P47hContextValue } from '../types';
  */
 export function useP47h(): P47hContextValue {
   const context = useContext(P47hContext);
-  
-  // The context always has a value (default throws errors),
-  // but we can detect missing provider by checking if state is stuck at 'init'
-  // and methods throw the "No provider" error.
-  // 
-  // For now, we just return the context directly.
-  // The default context methods will throw helpful errors.
-  
+
+  // The default context (used outside a provider) has methods that throw a helpful
+  // "No P47hProvider" error, so callers get a clear failure rather than a silent no-op.
   return context;
 }

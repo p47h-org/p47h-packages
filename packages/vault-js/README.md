@@ -55,9 +55,7 @@ The library loads the WASM module asynchronously:
 import { P47hVault } from '@p47h/vault-js';
 
 const vault = new P47hVault();
-await vault.init({ wasmPath: '/wasm/p47h_vault_v0.1.0.wasm' });
-
-// Console will show: "� P47H Vault v0.1.0 initialized"
+await vault.init(); // auto-detects the bundled WASM; pass { wasmPath } to override
 ```
 
 ### Identity Creation
@@ -160,20 +158,22 @@ Content-Security-Policy:
 | `script-src` | `'self'`             | Only load WASM from your origin           |
 | `connect-src`| `'self'`             | Prevent exfiltration to external servers  |
 
-### Subresource Integrity (SRI)
+### WASM integrity
 
-For CDN deployments, verify WASM integrity before loading:
+Serve the WASM from an origin you control and pin it: ship it as a versioned,
+immutable asset, verify its hash in your build/CI, and lock the package with
+`npm ci`. Combined with the strict CSP above (`script-src 'self'`), this keeps
+the binary content-addressable and same-origin.
 
 ```typescript
-import { P47hVault } from '@p47h/vault-js';
-
 const vault = new P47hVault();
-await vault.init({
-  wasmPath: 'https://cdn.example.com/wasm/p47h_vault.wasm',
-  // Optional: verify hash before instantiation
-  expectedHash: 'sha384-OLBgp1GsljhM2TJ+sbHjaiH9txEUvgdDTAzHvSG...'
-});
+// Serve the WASM as a versioned, immutable asset from your own origin:
+await vault.init({ wasmPath: '/wasm/p47h_vault_v0.10.2.wasm' });
 ```
+
+> **Roadmap:** a built-in `expectedHash` integrity check inside `init()` is
+> planned but **not available yet** — do not rely on an in-library hash check
+> today; pin the asset at the hosting/build layer as above.
 
 ### Best Practices
 
