@@ -338,7 +338,7 @@ export default function App() {
   return (
     <P47hProvider
       config={{
-        wasmPath: '/wasm/p47h_wasm_core.wasm',
+        wasmPath: '/wasm/p47h_wasm_core_bg.wasm',
       }}
       fallback={(elapsed) => <LoadingFallback elapsedMs={elapsed as number} />}
       errorFallback={(error) => <ErrorFallback error={error as Error} />}
