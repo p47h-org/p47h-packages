@@ -146,6 +146,30 @@ describe('VaultFacade (Integration)', () => {
         NotAuthenticatedError
       );
     });
+
+    it('should list the keys of stored secrets', async () => {
+      assert.deepStrictEqual(vault.listSecretKeys(), []);
+
+      await vault.saveSecret('api_key', 'a');
+      await vault.saveSecret('db_url', 'b');
+
+      assert.deepStrictEqual(vault.listSecretKeys().sort(), ['api_key', 'db_url']);
+    });
+
+    it('should list secret keys across lock/unlock', async () => {
+      await vault.saveSecret('api_key', 'a');
+      const did = vault.getDid();
+      vault.lock();
+      await vault.login('password123', did);
+
+      assert.deepStrictEqual(vault.listSecretKeys(), ['api_key']);
+    });
+
+    it('should throw when listing secret keys while locked', () => {
+      vault.lock();
+
+      assert.throws(() => vault.listSecretKeys(), NotAuthenticatedError);
+    });
   });
 
   describe('Recovery', () => {

@@ -303,6 +303,20 @@ export class VaultFacade implements IVault {
     return this._secretsUseCase!.getSecret(key);
   }
 
+  /**
+   * Lists the keys of all secrets in the currently unlocked vault.
+   *
+   * Reads from the in-memory session (no decryption round-trip). Returns an empty
+   * array when the vault holds no secrets.
+   *
+   * @returns The secret keys held by the unlocked identity
+   * @throws {NotAuthenticatedError} If vault is locked
+   */
+  listSecretKeys(): string[] {
+    this.ensureInitialized();
+    return this._secretsUseCase!.listSecretKeys();
+  }
+
   // ============================================================================
   // Lifecycle Management
   // ============================================================================

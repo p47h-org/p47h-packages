@@ -147,6 +147,16 @@ export interface IVault {
    */
   getSecret(key: string): Promise<string | null>;
 
+  /**
+   * Lists the keys of all secrets in the currently unlocked vault.
+   *
+   * Reads from the in-memory session. Returns an empty array when there are none.
+   *
+   * @returns The secret keys held by the unlocked identity
+   * @throws {NotAuthenticatedError} If vault is locked
+   */
+  listSecretKeys(): string[];
+
   // ============================================================================
   // Lifecycle
   // ============================================================================
