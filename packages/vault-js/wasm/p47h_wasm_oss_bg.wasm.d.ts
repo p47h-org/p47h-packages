@@ -1,0 +1,37 @@
+/* tslint:disable */
+/* eslint-disable */
+export const memory: WebAssembly.Memory;
+export const init: () => void;
+export const __wbg_p47hclient_free: (a: number, b: number) => void;
+export const p47hclient_generate_new: (a: number) => void;
+export const p47hclient_from_secret: (a: number, b: number, c: number) => void;
+export const p47hclient_export_wrapped_secret: (a: number, b: number, c: number, d: number) => void;
+export const p47hclient_from_wrapped_secret: (a: number, b: number, c: number, d: number, e: number) => void;
+export const p47hclient_get_did: (a: number, b: number) => void;
+export const p47hclient_get_public_key: (a: number, b: number) => void;
+export const p47hclient_sign_challenge: (a: number, b: number, c: number, d: number) => void;
+export const p47hclient_evaluate_request: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => void;
+export const p47hclient_evaluate_batch: (a: number, b: number, c: number, d: number, e: number, f: number) => void;
+export const validate_policy: (a: number, b: number, c: number) => void;
+export const validate_policy_detailed: (a: number, b: number, c: number) => void;
+export const __wbg_vaultcrypto_free: (a: number, b: number) => void;
+export const vaultcrypto_encrypt_vault: (a: number, b: number, c: number, d: number, e: number) => void;
+export const vaultcrypto_decrypt_vault: (a: number, b: number, c: number, d: number, e: number) => void;
+export const vaultcrypto_derive_session_key: (a: number, b: number, c: number, d: number, e: number) => void;
+export const wasmidentity_new: (a: number) => void;
+export const wasmidentity_publicKeyHash: (a: number, b: number) => void;
+export const wasmidentity_getDid: (a: number, b: number) => void;
+export const __wbg_wasmpolicy_free: (a: number, b: number) => void;
+export const wasmpolicy_new: (a: number, b: number, c: number, d: bigint) => void;
+export const wasmpolicy_addRule: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => void;
+export const wasmpolicy_name: (a: number, b: number) => void;
+export const wasmpolicy_ruleCount: (a: number) => number;
+export const wasmpolicy_getRootHash: (a: number, b: number) => void;
+export const p47hclient_sign_data: (a: number, b: number, c: number, d: number) => void;
+export const __wbg_wasmidentity_free: (a: number, b: number) => void;
+export const __wbindgen_export: (a: number, b: number) => number;
+export const __wbindgen_export2: (a: number, b: number, c: number, d: number) => number;
+export const __wbindgen_export3: (a: number) => void;
+export const __wbindgen_export4: (a: number, b: number, c: number) => void;
+export const __wbindgen_add_to_stack_pointer: (a: number) => number;
+export const __wbindgen_start: () => void;

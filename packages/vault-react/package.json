@@ -1,6 +1,6 @@
 {
   "name": "@p47h/vault-react",
-  "version": "0.10.2",
+  "version": "0.10.3",
   "type": "module",
   "description": "Encrypted persistent state for React applications. Secure secrets locally. No backend. No WebCrypto. No leaks.",
   "main": "./dist/index.cjs",
@@ -55,7 +55,7 @@
     "react-dom": ">=18.0.0"
   },
   "dependencies": {
-    "@p47h/vault-js": "0.10.2"
+    "@p47h/vault-js": "0.10.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",
