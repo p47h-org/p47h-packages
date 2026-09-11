@@ -14,7 +14,6 @@ export type { RegisterInput } from './use-cases/RegisterIdentityUseCase';
 export { LoginUseCase } from './use-cases/LoginUseCase';
 export type { LoginInput } from './use-cases/LoginUseCase';
 
-export { RecoverAccountUseCase } from './use-cases/RecoverAccountUseCase';
 
 export { SecretManagementUseCase } from './use-cases/SecretManagementUseCase';
 
@@ -27,4 +26,3 @@ export type { ICryptoPort, ICryptoClient } from './ports/ICryptoPort';
 
 // Internal Types
 export type { VaultInternalData } from './types';
-export { RECOVERY_CODE_PREFIX, RECOVERY_CODE_BYTES } from './types';

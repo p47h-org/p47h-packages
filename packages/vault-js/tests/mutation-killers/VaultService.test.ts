@@ -44,22 +44,13 @@ describe('VaultFacade.register - Mutation Killers', () => {
     );
   });
 
-  it('should generate recovery code with RK- prefix', async () => {
-    await vault.init();
-    const result = await vault.register('password123');
-    
-    // Kill mutant: recovery code prefix changed
-    assert.ok(result.recoveryCode.startsWith('RK-'), 'Must start with RK-');
-    assert.strictEqual(result.recoveryCode.split('-').length, 5, 'Must have 5 segments');
-  });
-
-  it('should save blob with version 1', async () => {
+  it('should save blob with version 2', async () => {
     await vault.init();
     const { did } = await vault.register('password123');
     
     // Kill mutant: version changed from 1
     const stored = await storage.get(did);
-    assert.strictEqual(stored?.version, 1, 'Version must be 1');
+    assert.strictEqual(stored?.version, 2, 'Version must be 2 — v1 blobs carried a recovery copy');
   });
 
   it('should set authenticated after register', async () => {
@@ -149,104 +140,8 @@ describe('VaultFacade.login - Mutation Killers', () => {
 });
 
 // ============================================================================
-// recoverAccount() Mutation Killers
 // ============================================================================
 
-describe('VaultFacade.recoverAccount - Mutation Killers', () => {
-  let vault: VaultFacade;
-  let storage: MockStorage;
-  let crypto: MockWasmAdapter;
-
-  beforeEach(async () => {
-    vault = new VaultFacade();
-    storage = new MockStorage();
-    crypto = new MockWasmAdapter();
-    (vault as any)._storage = storage;
-    (vault as any)._crypto = crypto;
-    await vault.init();
-  });
-
-  it('should return did in recovery result', async () => {
-    const { did, recoveryCode } = await vault.register('password123');
-    vault.lock();
-    
-    const result = await vault.recoverAccount({
-      recoveryCode,
-      newPassword: 'newpassword456',
-      rotateRecoveryCode: false,
-    });
-    
-    // Kill mutant: wrong DID in result
-    assert.strictEqual(result.did, did);
-  });
-
-  it('should generate new recovery code when rotateRecoveryCode is true', async () => {
-    const { recoveryCode } = await vault.register('password123');
-    vault.lock();
-    
-    const result = await vault.recoverAccount({
-      recoveryCode,
-      newPassword: 'newpassword456',
-      rotateRecoveryCode: true,
-    });
-    
-    // Kill mutant: rotateRecoveryCode branch not taken
-    assert.ok(result.newRecoveryCode, 'Should include new recovery code');
-    assert.ok(result.newRecoveryCode!.startsWith('RK-'), 'New code must be RK- format');
-    // Note: can't compare codes as mock uses deterministic random values
-  });
-
-  it('should NOT generate new recovery code when rotateRecoveryCode is false', async () => {
-    const { recoveryCode } = await vault.register('password123');
-    vault.lock();
-    
-    const result = await vault.recoverAccount({
-      recoveryCode,
-      newPassword: 'newpassword456',
-      rotateRecoveryCode: false,
-    });
-    
-    // Kill mutant: always rotates
-    assert.strictEqual(result.newRecoveryCode, undefined);
-  });
-
-  it('should login after recovery', async () => {
-    const { recoveryCode } = await vault.register('password123');
-    vault.lock();
-    
-    await vault.recoverAccount({
-      recoveryCode,
-      newPassword: 'newpassword456',
-      rotateRecoveryCode: false,
-    });
-    
-    // Kill mutant: auto-login not called
-    assert.strictEqual(vault.isAuthenticated(), true);
-  });
-
-  it('should update storage updatedAt after recovery', async () => {
-    const { did, recoveryCode } = await vault.register('password123');
-    const originalBlob = await storage.get(did);
-    const originalUpdatedAt = originalBlob?.updatedAt;
-    
-    // Wait a moment to ensure timestamp changes
-    await new Promise(resolve => setTimeout(resolve, 10));
-    
-    vault.lock();
-    
-    await vault.recoverAccount({
-      recoveryCode,
-      newPassword: 'newpassword456',
-      rotateRecoveryCode: false,
-    });
-    
-    const updatedBlob = await storage.get(did);
-    
-    // Kill mutant: storage not updated
-    assert.ok(updatedBlob, 'Blob should exist');
-    assert.ok(updatedBlob!.updatedAt >= originalUpdatedAt!, 'updatedAt should be >= original');
-  });
-});
 
 // ============================================================================
 // lock() and dispose() Mutation Killers

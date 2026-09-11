@@ -11,9 +11,7 @@
 import type { 
   IdentityInfo, 
   VaultConfig, 
-  RegistrationResult, 
-  RecoveryOptions,
-  RecoveryResult 
+  RegistrationResult
 } from './types';
 
 /**
@@ -44,11 +42,11 @@ export interface IVault {
    * Creates a new cryptographic identity (DID) and persists it encrypted.
    * Generates Ed25519 keys and encrypts them with the provided password.
    * 
-   * **IMPORTANT**: The returned `recoveryCode` is the ONLY way to recover
-   * the vault if the password is lost. It must be stored securely by the user.
+   * **There is no recovery mechanism.** The password is the only key to this
+   * vault; if it is lost, the data is unrecoverable. See RECOVERY.md.
    * 
    * @param password - Master password for key derivation
-   * @returns The generated DID and emergency recovery code
+   * @returns The generated DID
    * @throws {InitializationError} If vault not initialized
    * @throws {CryptoError} If key generation fails
    */
@@ -64,22 +62,6 @@ export interface IVault {
    * @throws {VaultError} If vault data is corrupted
    */
   login(password: string, did?: string): Promise<IdentityInfo>;
-
-  /**
-   * Recovers account access using the emergency recovery code.
-   * 
-   * Use this when the user has forgotten their password but has their
-   * recovery code. This will:
-   * 1. Decrypt the vault using the recovery code
-   * 2. Re-encrypt with the new password
-   * 3. Optionally generate a new recovery code
-   * 
-   * @param options - Recovery options including recovery code and new password
-   * @returns Recovery result with optional new recovery code
-   * @throws {AuthenticationError} If recovery code is invalid
-   * @throws {VaultError} If recovery is not available for this identity
-   */
-  recoverAccount(options: RecoveryOptions): Promise<RecoveryResult>;
 
   /**
    * Locks the vault and clears all sensitive data from memory.

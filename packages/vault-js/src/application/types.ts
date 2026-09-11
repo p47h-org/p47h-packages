@@ -18,6 +18,3 @@ export interface VaultInternalData {
   createdAt: number;
 }
 
-/** Recovery code format: RK-XXXX-XXXX-XXXX-XXXX (16 bytes = 32 hex chars) */
-export const RECOVERY_CODE_PREFIX = 'RK';
-export const RECOVERY_CODE_BYTES = 16;

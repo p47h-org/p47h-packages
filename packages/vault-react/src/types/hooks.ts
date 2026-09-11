@@ -37,9 +37,10 @@ export interface UseIdentityReturn {
 
   /**
    * Register a new identity.
-   * @returns The recovery code - MUST be shown to user!
+   * There is no recovery code: the password is the only key to the vault.
+   * See RECOVERY.md in @p47h/vault-js.
    */
-  register: (password: string) => Promise<{ did: string; recoveryCode: string }>;
+  register: (password: string) => Promise<{ did: string }>;
 
   /**
    * Login with an existing identity.
@@ -51,10 +52,6 @@ export interface UseIdentityReturn {
    */
   logout: () => void;
 
-  /**
-   * Recover account using recovery code.
-   */
-  recover: (recoveryCode: string, newPassword: string) => Promise<void>;
 
   /**
    * List of stored identity DIDs.

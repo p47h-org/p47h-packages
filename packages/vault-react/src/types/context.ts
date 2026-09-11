@@ -44,9 +44,10 @@ export interface P47hContextValue {
 
   /**
    * Register a new identity with the given password.
-   * @returns The recovery code - MUST be shown to user!
+   * There is no recovery code: the password is the only key to the vault.
+   * See RECOVERY.md in @p47h/vault-js.
    */
-  register: (password: string) => Promise<{ did: string; recoveryCode: string }>;
+  register: (password: string) => Promise<{ did: string }>;
 
   /**
    * Login with an existing identity.
@@ -58,10 +59,6 @@ export interface P47hContextValue {
    */
   logout: () => void;
 
-  /**
-   * Recover account using recovery code.
-   */
-  recover: (recoveryCode: string, newPassword: string) => Promise<void>;
 
   /**
    * Get a secret from the vault.

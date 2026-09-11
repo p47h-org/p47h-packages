@@ -89,18 +89,25 @@ describe('LoginUseCase', () => {
     await registerUseCase.execute({ password: 'test-password' });
     session.setSecret('api_key', 'secret_value');
     
-    // Manually update storage with secret (simulating saveSecret)
+    // Manually update storage with secret (simulating saveSecret).
+    //
+    // The real wrappedSecret and salt MUST be preserved: the identity is bound
+    // to the session key derived from (password, salt), so substituting dummy
+    // values here would make login fail for a reason unrelated to this test.
     const did = session.getDid();
     const stored = await storage.get(did);
     if (stored) {
-      // Update the encrypted data to include the secret
-      const internalData = {
-        did,
-        wrappedSecret: 'mock',
-        salt: 'mock',
-        secrets: { api_key: 'secret_value' },
-        createdAt: Date.now(),
-      };
+      const current = JSON.parse(
+        new TextDecoder().decode(
+          crypto.decryptVault(
+            Uint8Array.from(atob(stored.wrappedData), (c) => c.charCodeAt(0)),
+            'test-password'
+          )
+        )
+      );
+
+      const internalData = { ...current, secrets: { api_key: 'secret_value' } };
+
       const encrypted = crypto.encryptVault(
         new TextEncoder().encode(JSON.stringify(internalData)),
         'test-password'

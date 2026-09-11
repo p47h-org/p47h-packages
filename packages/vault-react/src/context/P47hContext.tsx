@@ -35,9 +35,6 @@ const defaultContextValue: P47hContextValue = {
   logout: () => {
     throw new Error('P47hContext: No provider found. Wrap your app in <P47hProvider>.');
   },
-  recover: async () => {
-    throw new Error('P47hContext: No provider found. Wrap your app in <P47hProvider>.');
-  },
   getSecret: async () => {
     throw new Error('P47hContext: No provider found. Wrap your app in <P47hProvider>.');
   },

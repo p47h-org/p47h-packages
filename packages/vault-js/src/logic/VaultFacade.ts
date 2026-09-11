@@ -19,9 +19,7 @@ import type { IStorage } from '../domain/IStorage';
 import type { 
   VaultConfig, 
   IdentityInfo,
-  RegistrationResult,
-  RecoveryOptions,
-  RecoveryResult
+  RegistrationResult
 } from '../domain/types';
 import { 
   InitializationError, 
@@ -33,7 +31,6 @@ import {
 import { 
   RegisterIdentityUseCase,
   LoginUseCase,
-  RecoverAccountUseCase,
   SecretManagementUseCase,
   SessionManager
 } from '../application';
@@ -48,7 +45,6 @@ import { BrowserStorage } from '../adapters/IndexedDbStorage';
  * This facade provides:
  * - **Identity Management**: Create and restore Ed25519 cryptographic identities
  * - **Secret Storage**: Encrypt and persist arbitrary secrets locally
- * - **Emergency Recovery**: Recover access using Recovery Codes (like 1Password)
  * - **Memory Safety**: Automatic cleanup of sensitive data from RAM
  * 
  * ## Security Model
@@ -57,7 +53,7 @@ import { BrowserStorage } from '../adapters/IndexedDbStorage';
  * - Private keys never leave WASM memory as plaintext
  * - Session keys are derived using Argon2id (OWASP recommended)
  * - Data is encrypted using XChaCha20-Poly1305 (AEAD)
- * - Dual encryption: password + recovery code for emergency access
+ * - There is NO recovery mechanism: the password is the only key (see RECOVERY.md)
  * 
  * @example
  * ```typescript
@@ -66,10 +62,10 @@ import { BrowserStorage } from '../adapters/IndexedDbStorage';
  * const vault = new P47hVault();
  * await vault.init({ wasmPath: '/wasm/p47h_vault_v0.10.0.wasm' });
  * 
- * // Create new identity - SAVE THE RECOVERY CODE!
- * const { did, recoveryCode } = await vault.register('my-secure-password');
+ * // Create a new identity. There is no recovery code and no way back:
+ * // if the password is lost, the data is gone.
+ * const { did } = await vault.register('my-secure-password');
  * console.log('Created:', did);
- * console.log('⚠️ Save this recovery code:', recoveryCode);
  * ```
  * 
  * @implements {IVault}
@@ -94,7 +90,6 @@ export class VaultFacade implements IVault {
 
   private _registerUseCase: RegisterIdentityUseCase | null = null;
   private _loginUseCase: LoginUseCase | null = null;
-  private _recoverUseCase: RecoverAccountUseCase | null = null;
   private _secretsUseCase: SecretManagementUseCase | null = null;
 
   // ============================================================================
@@ -168,11 +163,6 @@ export class VaultFacade implements IVault {
       this._session
     );
     
-    this._recoverUseCase = new RecoverAccountUseCase(
-      this._crypto,
-      this._storage
-    );
-    
     this._secretsUseCase = new SecretManagementUseCase(
       this._crypto,
       this._storage,
@@ -188,7 +178,7 @@ export class VaultFacade implements IVault {
    * Creates a new cryptographic identity and persists it encrypted.
    * 
    * @param password - Master password for key derivation (min 8 chars recommended)
-   * @returns Promise resolving to the DID and recovery code
+   * @returns Promise resolving to the DID
    * @throws {InitializationError} If vault not initialized
    */
   async register(password: string): Promise<RegistrationResult> {
@@ -208,23 +198,6 @@ export class VaultFacade implements IVault {
     this.ensureInitialized();
     const input = did !== undefined ? { password, did } : { password };
     return this._loginUseCase!.execute(input);
-  }
-
-  /**
-   * Recovers account access using the emergency recovery code.
-   * 
-   * @param options - Recovery options including recovery code and new password
-   * @returns Recovery result with optional new recovery code
-   * @throws {AuthenticationError} If recovery code is invalid
-   */
-  async recoverAccount(options: RecoveryOptions): Promise<RecoveryResult> {
-    this.ensureInitialized();
-    const result = await this._recoverUseCase!.execute(options);
-    
-    // Auto-login after recovery
-    await this.login(options.newPassword, result.did);
-    
-    return result;
   }
 
   /**

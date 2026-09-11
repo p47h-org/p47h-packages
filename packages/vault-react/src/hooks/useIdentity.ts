@@ -22,7 +22,6 @@ import type { UseIdentityReturn } from '../types';
  * - Registering new identities
  * - Logging in with existing identities
  * - Logging out (locking the vault)
- * - Account recovery
  * 
  * @returns Identity state and management functions
  * 
@@ -45,40 +44,18 @@ import type { UseIdentityReturn } from '../types';
  * }
  * ```
  * 
- * @example Registration with recovery code
+ * @example Registration
  * ```tsx
- * function RegisterForm() {
- *   const { register, isLoading } = useIdentity();
- *   const [recoveryCode, setRecoveryCode] = useState<string | null>(null);
- *   
- *   const handleRegister = async (password: string) => {
- *     const result = await register(password);
- *     setRecoveryCode(result.recoveryCode);
- *     // IMPORTANT: Show recovery code to user!
+ * function SignUp() {
+ *   const { register } = useIdentity();
+ *
+ *   // There is no recovery code. If the password is lost, the data is gone.
+ *   const onSubmit = async (password: string) => {
+ *     const { did } = await register(password);
+ *     console.log('Created', did);
  *   };
- *   
- *   if (recoveryCode) {
- *     return (
- *       <div>
- *         <h2>⚠️ Save your recovery code!</h2>
- *         <code>{recoveryCode}</code>
- *         <p>This is the only way to recover your vault if you forget your password.</p>
- *       </div>
- *     );
- *   }
- *   
- *   return (
- *     <form onSubmit={(e) => {
- *       e.preventDefault();
- *       const password = new FormData(e.currentTarget).get('password');
- *       if (password) handleRegister(password.toString());
- *     }}>
- *       <input name="password" type="password" placeholder="Password" />
- *       <button type="submit" disabled={isLoading}>
- *         {isLoading ? 'Creating...' : 'Create Vault'}
- *       </button>
- *     </form>
- *   );
+ *
+ *   return <PasswordForm onSubmit={onSubmit} />;
  * }
  * ```
  */
@@ -128,22 +105,6 @@ export function useIdentity(): UseIdentityReturn {
     context.logout();
   }, [context]);
   
-  // Wrapped recover with loading state
-  const recover = useCallback(async (recoveryCode: string, newPassword: string) => {
-    setIsOperationLoading(true);
-    setLocalError(null);
-    
-    try {
-      await context.recover(recoveryCode, newPassword);
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error(String(err));
-      setLocalError(error);
-      throw error;
-    } finally {
-      setIsOperationLoading(false);
-    }
-  }, [context]);
-  
   return {
     did: context.did,
     isAuthenticated: context.isAuthenticated,
@@ -153,6 +114,5 @@ export function useIdentity(): UseIdentityReturn {
     register,
     login,
     logout,
-    recover,
   };
 }

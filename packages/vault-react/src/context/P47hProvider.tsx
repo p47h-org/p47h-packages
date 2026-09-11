@@ -206,14 +206,6 @@ export function P47hProvider({
     }
   }, []);
   
-  const recover = useCallback(async (recoveryCode: string, newPassword: string) => {
-    const controller = controllerRef.current;
-    if (!controller) {
-      throw new Error('Provider not mounted');
-    }
-    await controller.recover(recoveryCode, newPassword);
-  }, []);
-  
   const getSecret = useCallback(async (key: string) => {
     const controller = controllerRef.current;
     if (!controller) {
@@ -244,7 +236,6 @@ export function P47hProvider({
     register,
     login,
     logout,
-    recover,
     getSecret,
     saveSecret,
   }), [
@@ -255,7 +246,6 @@ export function P47hProvider({
     register, 
     login, 
     logout, 
-    recover, 
     getSecret, 
     saveSecret
   ]);

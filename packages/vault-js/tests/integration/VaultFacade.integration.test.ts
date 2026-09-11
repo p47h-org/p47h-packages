@@ -53,10 +53,9 @@ describe('VaultFacade (Integration)', () => {
 
   describe('Identity Lifecycle', () => {
     it('should register a new identity', async () => {
-      const { did, recoveryCode } = await vault.register('password123');
+      const { did } = await vault.register('password123');
 
       assert.ok(did, 'Should return DID');
-      assert.ok(recoveryCode, 'Should return recovery code');
       assert.match(did, /^did:p47h:/, 'DID should have correct prefix');
     });
 
@@ -172,49 +171,7 @@ describe('VaultFacade (Integration)', () => {
     });
   });
 
-  describe('Recovery', () => {
-    it('should recover account with valid recovery code', async () => {
-      const { did, recoveryCode } = await vault.register('old-password');
-      vault.lock();
-
-      const result = await vault.recoverAccount({
-        recoveryCode,
-        newPassword: 'new-password'
-      });
-
-      assert.strictEqual(result.did, did);
-      assert.strictEqual(vault.isAuthenticated(), true);
-    });
-
-    it('should be able to login with new password after recovery', async () => {
-      const { recoveryCode } = await vault.register('old-password');
-      vault.lock();
-
-      await vault.recoverAccount({
-        recoveryCode,
-        newPassword: 'new-password'
-      });
-      vault.lock();
-
-      // Should login with new password
-      await vault.login('new-password');
-      assert.strictEqual(vault.isAuthenticated(), true);
-    });
-
-    it('should fail recovery with invalid code', async () => {
-      await vault.register('password');
-      vault.lock();
-
-      await assert.rejects(
-        async () => vault.recoverAccount({
-          recoveryCode: 'wrong',
-          newPassword: 'new-password'
-        }),
-        AuthenticationError
-      );
-    });
-  });
-
+  
   describe('Stored Identities', () => {
     it('should list stored identities', async () => {
       const { did } = await vault.register('password');

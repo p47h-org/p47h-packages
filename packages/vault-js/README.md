@@ -62,11 +62,14 @@ await vault.init(); // auto-detects the bundled WASM; pass { wasmPath } to overr
 
 Generates a new Ed25519 identity. The private key is encrypted immediately upon generation using a session key derived from the provided password.
 
+> **There is no recovery.** The password is the only key to the vault. If it is
+> lost, the data is unrecoverable — see [RECOVERY.md](./RECOVERY.md). Make this
+> explicit in your own UI at the moment the password is chosen.
+
 ```typescript
 try {
-  const { did, recoveryCode } = await vault.register("strong-user-password");
+  const { did } = await vault.register("strong-user-password");
   console.log("Identity created:", did); // e.g., did:p47h:123...
-  console.log("⚠️ Save this recovery code:", recoveryCode);
 } catch (error) {
   console.error("Registration failed:", error);
 }
@@ -116,8 +119,8 @@ interface VaultConfig {
 ### Core Methods
 
 ```typescript
-// Create new identity with recovery code
-vault.register(password: string): Promise<{did: string, recoveryCode: string}>;
+// Create new identity (no recovery code — see RECOVERY.md)
+vault.register(password: string): Promise<{did: string}>;
 
 // Unlock existing identity
 vault.login(password: string): Promise<IdentityInfo>;

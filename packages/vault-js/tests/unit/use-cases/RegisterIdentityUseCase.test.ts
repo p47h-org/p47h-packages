@@ -29,26 +29,14 @@ describe('RegisterIdentityUseCase', () => {
     assert.strictEqual(result.did, 'did:p47h:mock-identity');
   });
 
-  it('should generate a recovery code in correct format', async () => {
-    const result = await useCase.execute({ password: 'test-password' });
-
-    assert.ok(result.recoveryCode, 'Should return a recovery code');
-    assert.match(
-      result.recoveryCode,
-      /^RK-[A-F0-9]{8}-[A-F0-9]{8}-[A-F0-9]{8}-[A-F0-9]{8}$/,
-      'Recovery code should match format RK-XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX'
-    );
-  });
-
   it('should persist encrypted vault to storage', async () => {
     const result = await useCase.execute({ password: 'test-password' });
 
     const stored = await storage.get(result.did);
     assert.ok(stored, 'Vault should be persisted');
     assert.strictEqual(stored?.did, result.did);
-    assert.strictEqual(stored?.version, 1);
+    assert.strictEqual(stored?.version, 2);
     assert.ok(stored?.wrappedData, 'Should have encrypted data');
-    assert.ok(stored?.recoveryBlob, 'Should have recovery blob');
   });
 
   it('should establish authenticated session after registration', async () => {
@@ -64,19 +52,21 @@ describe('RegisterIdentityUseCase', () => {
     await useCase.execute({ password: 'test-password' });
 
     assert.strictEqual(crypto.calls.createIdentity, 1, 'Should call createIdentity once');
-    assert.strictEqual(crypto.calls.getRandomValues, 2, 'Should call getRandomValues for salt and recovery code');
+    assert.strictEqual(crypto.calls.getRandomValues, 1, 'Should call getRandomValues once, for the salt');
     assert.strictEqual(crypto.calls.deriveSessionKey, 1, 'Should derive session key');
-    assert.strictEqual(crypto.calls.encryptVault, 2, 'Should encrypt with password and recovery code');
+    assert.strictEqual(crypto.calls.encryptVault, 1, 'Should encrypt once, with the password');
   });
 
-  it('should create both password and recovery encrypted blobs', async () => {
+  it('should NOT create a second, recovery-encrypted blob', async () => {
     const result = await useCase.execute({ password: 'test-password' });
-    
+
     const stored = await storage.get(result.did);
     assert.ok(stored?.wrappedData, 'Should have password-encrypted blob');
-    assert.ok(stored?.recoveryBlob, 'Should have recovery-encrypted blob');
-    // Note: With deterministic mock, blobs may be similar.
-    // In production, different keys produce different ciphertext.
-    assert.strictEqual(crypto.calls.encryptVault, 2, 'Should encrypt twice (password + recovery)');
+    assert.strictEqual(
+      (stored as Record<string, unknown>)['recoveryBlob'],
+      undefined,
+      'a recovery blob is a second offline-attack oracle for the same data'
+    );
+    assert.strictEqual(crypto.calls.encryptVault, 1, 'Should encrypt exactly once');
   });
 });

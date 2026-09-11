@@ -39,8 +39,6 @@ export type {
   IdentityInfo, 
   EncryptedVaultBlob,
   RegistrationResult,
-  RecoveryOptions,
-  RecoveryResult
 } from './domain/types';
 
 // ============================================================================
@@ -63,7 +61,6 @@ export {
 export {
   RegisterIdentityUseCase,
   LoginUseCase,
-  RecoverAccountUseCase,
   SecretManagementUseCase,
   SessionManager
 } from './application';

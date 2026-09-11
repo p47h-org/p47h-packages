@@ -241,7 +241,7 @@ export class VaultController {
   /**
    * Register a new identity.
    */
-  async register(password: string): Promise<{ did: string; recoveryCode: string }> {
+  async register(password: string): Promise<{ did: string }> {
     this._ensureReady();
 
     try {
@@ -296,42 +296,6 @@ export class VaultController {
       this._eventEmitter.updateState(this._state, this._did, this._error);
       this._eventEmitter.emit('state-change');
     }
-  }
-
-  /**
-   * Recover account using recovery code.
-   */
-  async recover(recoveryCode: string, newPassword: string): Promise<void> {
-    this._ensureReady();
-
-    try {
-      await this.vault.recoverAccount({
-        recoveryCode,
-        newPassword,
-        rotateRecoveryCode: false,
-      });
-
-      // After recovery, user needs to login with new password
-      this._setState('locked');
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error(String(err));
-      this._error = error;
-      this._eventEmitter.updateState(this._state, this._did, this._error);
-      this._eventEmitter.emit('error');
-      throw error;
-    }
-  }
-
-  // ============================================================================
-  // Secret Management
-  // ============================================================================
-
-  /**
-   * Get a secret from the vault.
-   */
-  async getSecret(key: string): Promise<string | null> {
-    this._ensureAuthenticated();
-    return this.vault.getSecret(key);
   }
 
   /**

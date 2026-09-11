@@ -12,7 +12,7 @@ import type { RegistrationResult, EncryptedVaultBlob } from '../../domain/types'
 import type { ICryptoPort } from '../ports/ICryptoPort';
 import type { SessionManager } from '../services/SessionManager';
 import type { VaultInternalData } from '../types';
-import { RECOVERY_CODE_PREFIX, RECOVERY_CODE_BYTES } from '../types';
+
 import { toBase64 } from '../../utils/encoding';
 
 /**
@@ -28,8 +28,7 @@ export interface RegisterInput {
  * Responsibilities:
  * - Generate Ed25519 keypair via WASM
  * - Derive session key using Argon2id
- * - Generate recovery code
- * - Encrypt vault with both password and recovery code
+ * - Encrypt the vault with the password
  * - Persist to storage
  * - Establish authenticated session
  */
@@ -44,7 +43,7 @@ export class RegisterIdentityUseCase {
    * Executes the registration flow.
    * 
    * @param input - Registration parameters
-   * @returns The generated DID and recovery code
+   * @returns The generated DID
    */
   async execute(input: RegisterInput): Promise<RegistrationResult> {
     const { password } = input;
@@ -71,18 +70,22 @@ export class RegisterIdentityUseCase {
     const internalJson = JSON.stringify(internalData);
     const internalBytes = new TextEncoder().encode(internalJson);
 
-    // 4. Create encrypted copies for password and recovery access
+    // 4. Encrypt under the password.
+    //
+    //    NOTE: earlier versions also wrote a second copy of the whole vault
+    //    encrypted under a 16-byte "recovery code", and returned that code to
+    //    the caller. That mechanism could not work: the identity is wrapped with
+    //    material derived from the password, so opening the recovery copy still
+    //    left the identity unwrappable without the original password. It has
+    //    been removed rather than left as a false safety net. See RECOVERY.md.
     const encryptedMain = this.crypto.encryptVault(internalBytes, password);
-    const recoveryCode = this.generateRecoveryCode();
-    const encryptedRecovery = this.crypto.encryptVault(internalBytes, recoveryCode);
 
     // 5. Persist to storage
     const storageBlob: EncryptedVaultBlob = {
-      version: 1,
+      version: 2,
       did,
       salt: toBase64(salt),
       wrappedData: toBase64(encryptedMain),
-      recoveryBlob: toBase64(encryptedRecovery),
       updatedAt: Date.now()
     };
 
@@ -91,20 +94,6 @@ export class RegisterIdentityUseCase {
     // 6. Establish authenticated session
     this.session.establish(client, sessionKey, did, password, {});
 
-    return { did, recoveryCode };
-  }
-
-  /**
-   * Generates a high-entropy recovery code.
-   * Format: RK-XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX (32 hex chars)
-   */
-  private generateRecoveryCode(): string {
-    const bytes = this.crypto.getRandomValues(RECOVERY_CODE_BYTES);
-    const hex = Array.from(bytes)
-      .map(b => b.toString(16).padStart(2, '0').toUpperCase())
-      .join('');
-    
-    // Format: RK-XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX
-    return `${RECOVERY_CODE_PREFIX}-${hex.slice(0, 8)}-${hex.slice(8, 16)}-${hex.slice(16, 24)}-${hex.slice(24, 32)}`;
+    return { did };
   }
 }
